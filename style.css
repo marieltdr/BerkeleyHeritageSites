@@ -92,7 +92,7 @@ h2 {
     left: 20px;
   }
   #filter-container {
-    top: 145px; /* Adjust top coordinate to sit cleanly below H2 */
+    top: 125px;
     left: 20px;
   }
 }
