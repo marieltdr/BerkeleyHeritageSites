@@ -175,6 +175,7 @@ map.on('load', function() {
               yearFilter
             ]);
           }
-      // FILTERING ENDS
-  
+        });
+      }
+  // FILTERING ENDS
 });
