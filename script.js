@@ -19,58 +19,6 @@ map.on('load', function() {
     clusterMaxZoom: 12, 
     clusterRadius: 50 
   });
-
-    // FILTERING
-  fetch('https://raw.githubusercontent.com/marieltdr/183geodata/refs/heads/main/183data.geojson')
-    .then(res => res.json())
-    .then(data => {
-      // Extract 4-digit year from string like "1 Feb 1999" or "1999"
-      data.features.forEach(f => {
-        const dateStr = f.properties["original_*  Designated  *"] || f.properties["Designated"] || "";
-        const match = dateStr.match(/\b\d{4}\b/);
-        f.properties.year = match ? parseInt(match[0], 10) : null;
-      });
-  
-      // Add source with processed year properties
-      if (map.getSource('points-data')) {
-        map.getSource('points-data').setData(data);
-      } else {
-        map.addSource('points-data', {
-          type: 'geojson',
-          data: data,
-          generateId: true,
-          cluster: true,
-          clusterMaxZoom: 12,
-          clusterRadius: 50
-        });
-      }
-    });
-  
-  // Handle range dropdown changes
-  document.getElementById('date-filter').addEventListener('change', (e) => {
-    const range = e.target.value;
-  
-    let yearFilter;
-    if (range === 'before-2000') {
-      yearFilter = ['<', ['get', 'year'], 2000];
-    } else if (range === '2000-2005') {
-      yearFilter = ['all', ['>=', ['get', 'year'], 2000], ['<=', ['get', 'year'], 2005]];
-    } else if (range === 'after-2005') {
-      yearFilter = ['>', ['get', 'year'], 2005];
-    }
-  
-    if (range === 'all') {
-      map.setFilter('unclustered-point', ['!', ['has', 'point_count']]);
-    } else {
-      map.setFilter('unclustered-point', [
-        'all',
-        ['!', ['has', 'point_count']],
-        ['has', 'year'],
-        yearFilter
-      ]);
-    }
-  });
-  // FILTERING ENDS
   
   // Cluster Circles
   map.addLayer({
@@ -202,4 +150,31 @@ map.on('load', function() {
     }
     hoveredStateId = null;
   });
+// FILTERING
+  const filterSelect = document.getElementById('date-filter');
+      if (filterSelect) {
+        filterSelect.addEventListener('change', (e) => {
+          const range = e.target.value;
+
+          if (range === 'all') {
+            map.setFilter('unclustered-point', ['!', ['has', 'point_count']]);
+          } else {
+            let yearFilter;
+            if (range === 'before-2000') {
+              yearFilter = ['<', ['get', 'year'], 2000];
+            } else if (range === '2000-2005') {
+              yearFilter = ['all', ['>=', ['get', 'year'], 2000], ['<=', ['get', 'year'], 2005]];
+            } else if (range === 'after-2005') {
+              yearFilter = ['>', ['get', 'year'], 2005];
+            }
+
+            map.setFilter('unclustered-point', [
+              'all',
+              ['!', ['has', 'point_count']],
+              ['has', 'year'],
+              yearFilter
+            ]);
+          }
+      // FILTERING ENDS
+  
 });
