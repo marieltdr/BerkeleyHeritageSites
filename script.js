@@ -64,7 +64,8 @@ map.on('load', async function() {
       ],
       'circle-stroke-width': 1.5,
       'circle-stroke-color': '#FFFFFF',
-      'circle-stroke-opacity': 1
+      'circle-stroke-opacity': 1,
+      'circle-emissive-strength': 1.0
     }
   });
 
@@ -77,7 +78,11 @@ map.on('load', async function() {
       'text-field': ['get', 'point_count_abbreviated'],
       'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
       'text-size': 12
-    }
+    },
+    paint: {
+      'text-color': '#000000', 
+      'text-halo-color': '#FFFFFF',
+      'text-halo-width': 0.5
   });
 
   map.addLayer({
@@ -95,7 +100,8 @@ map.on('load', async function() {
       ],
     'circle-stroke-width': 1.5,
     'circle-stroke-color': '#FFFFFF',
-    'circle-stroke-opacity': 1    
+    'circle-stroke-opacity': 1,
+    'circle-emissive-strength': 1.0
     }
   });
 
