@@ -10,15 +10,41 @@ const map = new mapboxgl.Map({
 
 map.addControl(new mapboxgl.NavigationControl());
 
-map.on('load', function() {
+// FILTERING
+  let rawGeoJson = null;
+
+  function extractYear(feature) {
+  const props = feature.properties;
+  
+  // Look exclusively at the designated property keys
+  const dateStr = 
+    props["original_*  Designated  *"] || 
+    props["Designated"] || 
+    props["original_*Designated*"] || 
+    "";
+
+  // Match a 4-digit year starting with 19 or 20 (e.g. "9 Dec 2002" -> 2002)
+  const match = String(dateStr).match(/\b(19|20)\d{2}\b/);
+  return match ? parseInt(match[0], 10) : null;
+}
+  
+
+map.on('load', async function() {
+  // 1. Fetch GeoJSON
+  const response = await fetch('https://raw.githubusercontent.com/marieltdr/183geodata/refs/heads/main/183data.geojson');
+  rawGeoJson = await response.json();
+
+  // 2. Initialize source with fetched data
   map.addSource('points-data', {
     type: 'geojson',
-    data: 'https://raw.githubusercontent.com/marieltdr/183geodata/refs/heads/main/183data.geojson',
+    data: rawGeoJson,
     generateId: true,
-    cluster: true, 
-    clusterMaxZoom: 12, 
-    clusterRadius: 50 
+    cluster: true,
+    clusterMaxZoom: 12,
+    clusterRadius: 50
   });
+
+// FILTERING ENDS
   
   // Cluster Circles
   map.addLayer({
@@ -151,31 +177,34 @@ map.on('load', function() {
     hoveredStateId = null;
   });
 // FILTERING
-  const filterSelect = document.getElementById('date-filter');
-      if (filterSelect) {
-        filterSelect.addEventListener('change', (e) => {
-          const range = e.target.value;
+const filterSelect = document.getElementById('date-filter');
+  if (filterSelect) {
+    filterSelect.addEventListener('change', (e) => {
+      const range = e.target.value;
 
-          if (range === 'all') {
-            map.setFilter('unclustered-point', ['!', ['has', 'point_count']]);
-          } else {
-            let yearFilter;
-            if (range === 'before-2000') {
-              yearFilter = ['<', ['get', 'year'], 2000];
-            } else if (range === '2000-2005') {
-              yearFilter = ['all', ['>=', ['get', 'year'], 2000], ['<=', ['get', 'year'], 2005]];
-            } else if (range === 'after-2005') {
-              yearFilter = ['>', ['get', 'year'], 2005];
-            }
+      if (!rawGeoJson) return;
 
-            map.setFilter('unclustered-point', [
-              'all',
-              ['!', ['has', 'point_count']],
-              ['has', 'year'],
-              yearFilter
-            ]);
-          }
-        });
+      if (range === 'all') {
+        map.getSource('points-data').setData(rawGeoJson);
+        return;
       }
+
+      const filteredFeatures = rawGeoJson.features.filter((feature) => {
+        const year = extractYear(feature);
+        if (!year) return false;
+
+        if (range === 'before-2000') return year < 2000;
+        if (range === '2000-2005') return year >= 2000 && year <= 2005;
+        if (range === 'after-2005') return year > 2005;
+        return true;
+      });
+
+      // Updates points and forces cluster recalculation
+      map.getSource('points-data').setData({
+        type: 'FeatureCollection',
+        features: filteredFeatures
+      });
+    });
+  }
   // FILTERING ENDS
 });
