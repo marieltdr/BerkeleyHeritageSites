@@ -10,31 +10,26 @@ const map = new mapboxgl.Map({
 
 map.addControl(new mapboxgl.NavigationControl());
 
-// FILTERING
   let rawGeoJson = null;
 
   function extractYear(feature) {
   const props = feature.properties;
   
-  // Look exclusively at the designated property keys
   const dateStr = 
     props["original_*  Designated  *"] || 
     props["Designated"] || 
     props["original_*Designated*"] || 
     "";
 
-  // Match a 4-digit year starting with 19 or 20 (e.g. "9 Dec 2002" -> 2002)
   const match = String(dateStr).match(/\b(19|20)\d{2}\b/);
   return match ? parseInt(match[0], 10) : null;
 }
   
 
 map.on('load', async function() {
-  // 1. Fetch GeoJSON
   const response = await fetch('https://raw.githubusercontent.com/marieltdr/183geodata/refs/heads/main/183data.geojson');
   rawGeoJson = await response.json();
 
-  // 2. Initialize source with fetched data
   map.addSource('points-data', {
     type: 'geojson',
     data: rawGeoJson,
@@ -44,7 +39,6 @@ map.on('load', async function() {
     clusterRadius: 50
   });
 
-// FILTERING ENDS
   
   // Cluster Circles
   map.addLayer({
@@ -68,9 +62,9 @@ map.on('load', async function() {
         5, 24, 
         15, 30 
       ]
-      //'circle-stroke-width': 1.5,
-      //'circle-stroke-color': '#FFFFFF'
-      //'circle-stroke-opacity': 1
+      'circle-stroke-width': 1.5,
+      'circle-stroke-color': '#FFFFFF',
+      'circle-stroke-opacity': 1
     }
   });
 
@@ -92,16 +86,16 @@ map.on('load', async function() {
     source: 'points-data',
     filter: ['!', ['has', 'point_count']],
     paint: {
-      'circle-color': '#FFFF70',
+      'circle-color': '#FFFF00',
       'circle-radius': [
         'case',
         ['boolean', ['feature-state', 'hover'], false],
         10, // Size when hovered
         6   // Default size
       ],
-      'circle-stroke-width': 1,
-      'circle-stroke-color': '#fff'
-    }
+    'circle-stroke-width': 1.5,
+    'circle-stroke-color': '#FFFFFF',
+    'circle-stroke-opacity': 1    
   });
 
   // Zoom into clusters on click
