@@ -96,6 +96,7 @@ map.on('load', async function() {
     'circle-stroke-width': 1.5,
     'circle-stroke-color': '#FFFFFF',
     'circle-stroke-opacity': 1    
+    }
   });
 
   // Zoom into clusters on click
