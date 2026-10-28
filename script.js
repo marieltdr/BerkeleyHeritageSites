@@ -83,6 +83,7 @@ map.on('load', async function() {
       'text-color': '#000000', 
       'text-halo-color': '#FFFFFF',
       'text-halo-width': 0.5
+    }
   });
 
   map.addLayer({
