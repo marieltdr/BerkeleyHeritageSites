@@ -27,7 +27,7 @@ map.addControl(new mapboxgl.NavigationControl());
   
 
 map.on('load', async function() {
-  const response = await fetch('https://raw.githubusercontent.com/marieltdr/183geodata/refs/heads/main/183data.geojson');
+  const response = await fetch('https://raw.githubusercontent.com/marieltdr/183geodata/refs/heads/main/updatedberkeleydata.geojson');
   rawGeoJson = await response.json();
 
   map.addSource('points-data', {
