@@ -61,7 +61,7 @@ map.on('load', async function() {
         18, 
         5, 24, 
         15, 30 
-      ]
+      ],
       'circle-stroke-width': 1.5,
       'circle-stroke-color': '#FFFFFF',
       'circle-stroke-opacity': 1
